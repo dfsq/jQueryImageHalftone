@@ -1,0 +1,64 @@
+<html>
+<head>
+	<script type="text/javascript">
+		function halftone(image) {
+			var myCanvas = document.createElement("canvas");
+			var myCanvasContext = myCanvas.getContext("2d");
+
+			myCanvas.width = image.width;
+			myCanvas.height = image.height;
+			myCanvasContext.drawImage(image, 0, 0);
+
+			var imageData = myCanvasContext.getImageData(0, 0, image.width, image.height);
+
+			var findClosestPaletteColor = function(oldPixel) {
+				return oldPixel < 127 ? 1 : 255;
+			}
+
+			for (var i = 0; i < imageData.height; i++) {
+				for (var j = 0; j < imageData.width; j++) {
+
+					// Get pixel average color
+					var pixel = function(y, x, value) {
+						var index = y * 4 * imageData.width + x * 4;
+
+						if (typeof value != 'undefined') {
+							imageData.data[index] = value;
+							imageData.data[index + 1] = value;
+							imageData.data[index + 2] = value;
+						}
+						else {
+							var red = imageData.data[index];
+							var green = imageData.data[index + 1];
+							var blue = imageData.data[index + 2];
+							return (red + green + blue) / 3;
+						}
+					};
+
+					// To grayscale
+					var oldPixel = pixel(i, j);
+
+					// New pixel value
+					var newPixel = findClosestPaletteColor(oldPixel);
+
+					// Set new pixel
+					pixel(i, j, newPixel);
+
+					var quantError = oldPixel - newPixel;
+
+					pixel(i, j+1, pixel(i, j+1) + (7/16)*quantError);
+					pixel(i+1, j-1, pixel(i+1, j-1) + (3/16)*quantError);
+					pixel(i+1, j, pixel(i+1, j) + (5/16)*quantError);
+					pixel(i+1, j+1, pixel(i+1, j+1) + (1/16)*quantError);
+				}
+			}
+
+			myCanvasContext.putImageData(imageData, 0, 0, 0, 0, imageData.width, imageData.height);
+			image.parentNode.appendChild(myCanvas);
+		}
+	</script>
+</head>
+<body>
+<img src="test.jpg" onload="halftone(this)">
+</body>
+</html>
