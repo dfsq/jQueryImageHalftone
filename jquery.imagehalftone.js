@@ -33,8 +33,6 @@
 					});
 					this.ctx = this.canvas[0].getContext('2d');
 
-					console.log('Canvas created: %dx%d', this.canvas.attr('width'), this.canvas.attr('height'));
-
 					// Draw the image on canvas first
 					this.ctx.drawImage($img[0], 0, 0);
 
@@ -42,6 +40,28 @@
 					this.raw = this.ctx.getImageData(0, 0, this.canvas.attr('width'), this.canvas.attr('height'));
 
 					this.process();
+
+					// TODO temp append canvas to document
+					this.canvas.appendTo('body');
+				},
+
+				drawCircle: function(i, j, gray) {
+					var saturation = this.saturation(gray);
+					var r = options.radius;
+
+					// Radius of the circle to be placed in the section
+					var R = Math.round(r * Math.sqrt(saturation / Math.PI));
+
+					// Draw square first
+					this.ctx.fillStyle = '#FFF';
+					this.ctx.fillRect(i, j, r, r);
+
+					// Draw circle
+					this.ctx.fillStyle = '#000';
+					this.ctx.beginPath();
+					this.ctx.arc(i + r/2, j + r/2, R, 0, 2 * Math.PI);
+					this.ctx.closePath();
+					this.ctx.fill();
 				},
 
 				/**
@@ -51,9 +71,11 @@
 				 * or squares like 16x16 pixels. Size of the section is defined by radius setting.
 				 * @param x int coordinates of the left upper corner pixel
 				 * @param y int coordinates of the left upper corner pixel
+				 * @param radius
 				 * @param value int a new color to assign to pixel (section); if defined method acts as setter.
 				 */
-				area: function(i, j, radius, value) {
+				area: function(i, j, radius, value, gray) {
+
 					if (radius == 1) {
 						var index = i * 4 + j * 4 * this.raw.width;
 						if (typeof value == 'undefined') {
@@ -76,15 +98,29 @@
 							return average/(radius*radius);
 						}
 						else {
-							for (var ri = 0; ri < radius; ri++)
-								for (var rj = 0; rj < radius; rj++)
-									this.area(i + ri, j + rj, 1, value);
+//							for (var ri = 0; ri < radius; ri++)
+//								for (var rj = 0; rj < radius; rj++)
+//									this.area(i + ri, j + rj, 1, value);
+
+							this.drawCircle(i, j, gray);
 						}
 					}
 				},
 
+				/**
+				 * Switch the color between completely white and black.
+				 * @param color
+				 */
 				closestColor: function(color) {
 					return color < 128 ? 0 : 255;
+				},
+
+				/**
+				 * Define how dark the gray color is. 0 - means 100% black.
+				 * @param color
+				 */
+				saturation: function(color) {
+					return (255 - color) / 255;
 				},
 
 				process: function() {
@@ -101,7 +137,7 @@
 							var newPixel = this.closestColor(oldPixel);
 
 							// Set new pixel
-							this.area(i, j, d, newPixel);
+							this.area(i, j, d, newPixel, oldPixel);
 
 							var quantError = oldPixel - newPixel;
 							j+d < this.raw.width  && this.area(i, j+d, d, this.area(i, j+d, d) + (7/16)*quantError);
@@ -111,10 +147,7 @@
 						}
 					}
 
-					this.ctx.putImageData(this.raw, 0, 0, 0, 0, this.raw.width, this.raw.height);
-
-					// Append canvas to document
-					this.canvas.appendTo('body');
+					//this.ctx.putImageData(this.raw, 0, 0, 0, 0, this.raw.width, this.raw.height);
 				}
 			};
 		};
