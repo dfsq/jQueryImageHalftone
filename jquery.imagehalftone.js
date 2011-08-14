@@ -1,22 +1,29 @@
 /**
+ * jQuery imageHalftone plugin.
  * Simple image halftone Floyd-Steinberg dithering algorithm implementation.
  * Converts image into two color halftoned.
  *
- * @author Aliaksandr Astashenkau, dfsq.dfsq@gmail.com.
- *
- * Options:
- * radius: [Integer:1] Number of pixels per dot.
- * output: [String:'canvas'] Type of resulting image representation.
- *     canvas - original image is replaced with canvas element.
- *     image  - original image is replaced with a new image.
- * target: [String:null] CSS selector of the container to append new converted
- *     image (or canvas) to. Original image will not be replaced.
- * grayscale: [Boolean:false] Just convert image to grayscale.
- * addCSS: [Object:{}] CSS properties to be added to the image or canvas.
- * addClass: [String:null] Class name to be added.
+ * @author Aliaksandr Astashenkau, dfsq.dfsq@gmail.com
+ * @author-website http://dfsq.info
+ * @license MIT License - http://www.opensource.org/licenses/mit-license.php
+ * @version 0.2
  */
 ;(function($) {
 	$.fn.imageHalftone = function(options) {
+
+		/**
+		 * Default options.
+		 *
+		 * radius: [Integer:1] Number of pixels per dot.
+		 * output: [String:'canvas'] Type of resulting image representation.
+		 *   canvas - original image is replaced with canvas element.
+		 *   image  - original image is replaced with a new image.
+		 * target: [String:null] CSS selector of the container to append new converted
+		 *   image (or canvas) to. Original image will not be replaced.
+		 * grayscale: [Boolean:false] Just convert image to grayscale.
+		 * addCSS: [Object:{}] CSS properties to be added to the image or canvas.
+		 * addClass: [String:null] Class name to be added.
+		 */
 		var settings = $.extend({
 			radius: 1,
 			output: 'canvas',
@@ -51,9 +58,7 @@
 					// Array of image color pixels
 					this.raw = this.ctx.getImageData(0, 0, this.canvas.attr('width'), this.canvas.attr('height'));
 
-					console.time('process');
 					this.process();
-					console.timeEnd('process');
 
 					// New element
 					var $el = settings.output == 'canvas'
@@ -61,7 +66,7 @@
 						: (function(c) {
 							var i = new Image();
 							i.src = c.toDataURL("image/png");
-							return i;
+							return $(i);
 						})(this.canvas[0]);
 
 					settings.addClass && $el.addClass(settings.addClass);
@@ -117,14 +122,13 @@
 
 				/**
 				 * Switch the color between completely white and black.
-				 * @param color
 				 */
 				closestColor: function(color) {
 					return color < 128 ? 0 : 255;
 				},
 
 				process: function() {
-					// Iteration delta
+
 					var r = settings.radius,
 						w = this.raw.width,
 						h = this.raw.height;
@@ -132,13 +136,15 @@
 					// Iterate over each pixel in array
 					for (var i = 0; i < h; i = i + r) {
 						for (var j = 0; j < w; j = j + r) {
+
 							// Old pixel converted to grayscale
 							var oldPixel = newPixel = this.area(i, j, r);
 
 							if (!settings.grayscale) {
-								// Change color accordeing to how dark gray is
+								// Change color depending on how dark gray is
 								var newPixel = this.closestColor(oldPixel);
 
+								// Actual algorithm
 								var quantError = oldPixel - newPixel;
 								j+r < w && this.area(i, j+r, r, this.area(i, j+r, r) + (7/16)*quantError);
 								i+r < h && j > r && this.area(i+r, j-r, r, this.area(i+r, j-r, r) + (3/16)*quantError);
@@ -156,9 +162,6 @@
 			};
 		};
 
-		/**
-		 * Run transformations.
-		 */
 		return support() && this.each(function() {
 			$(this).is('img') && new Halftone($(this)).create();
 		});
