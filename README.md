@@ -10,7 +10,7 @@ Here is the example of image conversion:
 
 * radius: [Integer:1] Number of pixels per dot.
 * output: [String(canvas|image):'canvas'] Type of resulting image. canvas - original image is replaced with a canvas element; image - original image is replaced with a new image.
-* target: [String:null] CSS selector of the container to append new converted image (or canvas) to. Original image will not be replaced.
+* target: [Mixed:null] CSS selector of the container to append new converted image (or canvas) to. Original image will not be replaced. If target is a function then it is called with new image passed as argument.
 * grayscale: [Boolean:false] Just convert image to grayscale.
 * addCSS: [Object:{}] CSS properties to be added to the image or canvas.
 * addClass: [String:null] Class name to be added.
@@ -20,6 +20,9 @@ Here is the example of image conversion:
 ```javascript
 $('#poster').imageHalftone({
     output: 'image',
-    addClass: 'ht-poster'
+    addClass: 'ht-poster',
+    target: function($new) {
+    	$new.appendTo('#posters-container')
+    }
 });
 ```

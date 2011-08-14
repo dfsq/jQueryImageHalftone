@@ -14,7 +14,9 @@
 $(window).load(function() {
 	$('#image').imageHalftone({
 		output: 'image',
-		target: 'body'
+		target: function($new) {
+			$new.appendTo('body');
+		}
 	});
 });
 </script>

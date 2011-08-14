@@ -72,7 +72,9 @@
 					settings.addClass && $el.addClass(settings.addClass);
 					$el.css(settings.addCSS);
 
-					settings.target ? $(settings.target).append($el) : $img.replaceWith($el);
+					settings.target
+						? (typeof settings.target === 'function' ? settings.target($el) : $(settings.target).html($el))
+						: $img.replaceWith($el);
 				},
 
 				/**
