@@ -9,11 +9,8 @@ Here is the example of image conversion:
 ## Available options ##
 
 * radius: [Integer:1] Number of pixels per dot.
-* output: [String:'canvas'] Type of resulting image. Can be:
-*     canvas - original image is replaced with a canvas element.
-*     image  - original image is replaced with a new image.
-* target: [String:null] CSS selector of the container to append new converted.
-*     image (or canvas) to. Original image will not be replaced.
+* output: [String(canvas|image):'canvas'] Type of resulting image. canvas - original image is replaced with a canvas element; image - original image is replaced with a new image.
+* target: [String:null] CSS selector of the container to append new converted image (or canvas) to. Original image will not be replaced.
 * grayscale: [Boolean:false] Just convert image to grayscale.
 * addCSS: [Object:{}] CSS properties to be added to the image or canvas.
 * addClass: [String:null] Class name to be added.
