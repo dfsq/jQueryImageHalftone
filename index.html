@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="ru-RU">
+<html lang="en-EN">
 <head>
 	<title>Test</title>
 	<meta charset="UTF-8">
@@ -8,12 +8,13 @@
 
 <img src="test.jpg" id="image">
 
-<script type="text/javascript" src="jquery-1.4.1.min.js"></script>
+<script type="text/javascript" src="jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="jquery.imagehalftone.js"></script>
 <script type="text/javascript">
 $(window).load(function() {
 	$('#image').imageHalftone({
-		radius: 15
+		output: 'image',
+		target: 'body'
 	});
 });
 </script>
