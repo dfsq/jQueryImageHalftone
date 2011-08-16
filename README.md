@@ -26,3 +26,9 @@ $('#poster').imageHalftone({
     }
 });
 ```
+
+## Demo page ##
+
+[View demo page].
+
+[View demo page]: http://dfsq.info/projects/imageHalftone
