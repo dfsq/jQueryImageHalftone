@@ -57,6 +57,8 @@
 
 					// Array of image color pixels
 					this.raw = this.ctx.getImageData(0, 0, this.canvas.attr('width'), this.canvas.attr('height'));
+					this.rawW = this.raw.width;
+					this.rawH = this.raw.height;
 
 					this.process();
 
@@ -92,7 +94,8 @@
 					var d = this.raw.data;
 
 					if (r == 1) {
-						var index = i * 4 + j * 4 * this.raw.width;
+						var index = i * 4 * this.rawW + j * 4;
+
 						if (typeof val == 'undefined') {
 							return (d[index] + d[index + 1] + d[index + 2]) / 3;
 						}
@@ -132,22 +135,24 @@
 				process: function() {
 
 					var r = settings.radius,
-						w = this.raw.width,
-						h = this.raw.height;
+						w = this.rawW,
+						h = this.rawH,
+						oldPixel, newPixel, quantError,
+						i, j;
 
 					// Iterate over each pixel in array
-					for (var i = 0; i < h; i = i + r) {
-						for (var j = 0; j < w; j = j + r) {
+					for (i = 0; i < h; i += r) {
+						for (j = 0; j < w; j += r) {
 
 							// Old pixel converted to grayscale
-							var oldPixel = newPixel = this.area(i, j, r);
+							oldPixel = newPixel = this.area(i, j, r);
 
 							if (!settings.grayscale) {
 								// Change color depending on how dark gray is
-								var newPixel = this.closestColor(oldPixel);
+								newPixel = this.closestColor(oldPixel);
 
 								// Actual algorithm
-								var quantError = oldPixel - newPixel;
+								quantError = oldPixel - newPixel;
 								j+r < w && this.area(i, j+r, r, this.area(i, j+r, r) + (7/16)*quantError);
 								i+r < h && j > r && this.area(i+r, j-r, r, this.area(i+r, j-r, r) + (3/16)*quantError);
 								i+r < h && this.area(i+r, j, r, this.area(i+r, j, r) + (5/16)*quantError);
@@ -159,7 +164,7 @@
 						}
 					}
 
-					this.ctx.putImageData(this.raw, 0, 0, 0, 0, w, h);
+					this.ctx.putImageData(this.raw, 0, 0);
 				}
 			};
 		};
