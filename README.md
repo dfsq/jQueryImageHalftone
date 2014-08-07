@@ -23,6 +23,8 @@ $('#poster').imageHalftone({
 });
 ```
 
+![Example](http://dfsq.info/files/tiger-halftone.png)
+
 ## Demo page ##
 
 [View demo page].
